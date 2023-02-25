@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+
+      body{display:flex;
+      flex-direction: column;
+      align-items: center;
+      }
+      #room{
+        height: 100vh;
+        width: 600px;
+        position: relative;
+      }
+      #roomName{
+        color: white;
+        background: black;
+        padding: 5px;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      #roomMessage{
+        min-height: 70vh;
+        max-height: 70vh;
+        overflow-y: scroll;
+        background: #202020;
+      }
+
+      #form1{
+        height: 100px;
+        background: #000;
+        width: 100%;
+        display: flex;
+      }
+      #form1 input[type='text']{
+        color:white;
+        width:70%;
+        border: none;
+        background: none;
+      }
+      #form1 input[type='submit']{
+        color: white;
+    
+        width:30%;
+        border: none;
+        background: rgb(92, 92, 92);
+      }
+      #form1 input[type='submit']:hover{
+        background: white;
+        cursor: pointer;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div id="room">
+      <h1 id="roomName"></h1>
+      <div id="roomMessage">
+      
+      </div>
+      <form action="" id="form1">
+        <input type="text" id="message" placeholder="type your message here...">
+        <input type="submit" value="SEND"/>
+        </form>
+      </div>
+
+
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  let params = new URLSearchParams(document.location.search);
+let globalRoomName = params.get("roomName"); // is the string "Jonathan"
+
+  var socket = io();
+  
+  var form1 = document.getElementById('form1');
+  var message = document.getElementById('message');
+
+  var joinRoomName= document.getElementById('joinRoom');
+  var roomNameTag=document.querySelector("#roomName");
+
+socket.emit("join room",globalRoomName);
+
+socket.on("roomName",(roomName)=>{
+  roomNameTag.innerHTML=`Room : ${roomName}`;
+  globalRoomName=roomName;
+})
+  form1.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    const sendMessage=message.value;
+
+    const data={
+      message:sendMessage,
+      roomName:globalRoomName
+    }
+
+    socket.emit("clientMessage",data);
+
+  })
+
+  socket.on("response",(message)=>{
+      document.getElementById("roomMessage").innerHTML+=`<p>${message}</p>`
+      roomNameTag.scrollTop=comment_list.scrollHeight-comment_list.clientHeight; 
+    })
+  // form.addEventListener('submit', function(e) {
+  //   e.preventDefault();
+  //  socket.emit("client message",input.value);
+  //  socket.on("broadcast",(msg)=>{console.log(msg)})
+  // });
+
+  // socket.emit("create room","room1");
+</script>
+  </body>
+</html>

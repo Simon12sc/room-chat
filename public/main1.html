@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>HTML</title>
+  
+  <!-- HTML -->
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&family=Dongle:wght@700&family=Pacifico&family=Rampart+One&display=swap');
+  *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Balsamiq Sans', cursive;
+  }
+  .chatBox{
+    width: 100vw;
+    height: 100vh;
+  }
+  .head{
+    width:100vw;
+    height:50px;
+    display:flex;
+    align-items:center;
+    background: #626FFF;
+    border-radius: 0px 0px 10px 10px;
+    box-shadow: 0px 1px 4px 1px rgba(0,0,0,0.3);
+    padding: 10px; 
+  }
+  .head p{
+    color:white;
+    font-size:15px;
+  }
+  .profile{
+    width:40px;
+    height:40px;
+    overflow:hidden;
+    border-radius:50%;
+    border:2px solid white;
+  }
+  .online{
+    position: relative;
+    top:10px;
+    left:-8px;
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #03D400;
+    border:1px solid white;
+  }
+  .profile img{
+    height: 100%;
+  }
+  
+  
+  .messageBox{
+    width: 100vw;
+    height:75vh;
+    padding: 20px;
+    overflow-y: scroll;
+  }
+  #botMsg{
+    position: relative;
+    min-height:4vh;
+    max-width:60vw;
+   background: #CCCCCC;
+   border-radius: 5px;
+   display:flex;
+   align-items: center;
+   font-size:13px;
+   padding: 10px;
+   word-wrap: break-word;
+   word-break: break-all;
+  }
+  #botMsgMain{
+display:flex;   
+margin:20px 0px;
+position: relative;
+  }
+  #myMsg {
+    min-height: 4vh;
+    max-width: 60vw;
+    background: #5C69FF;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    padding: 10px;
+    color: white;
+  }
+.myMsgOut{
+  position:relative;
+  display: flex;
+}
+  #myMsgMain {
+    display: flex;
+    margin: 10px 10px 10px auto;
+    position:relative;
+  }
+  
+  #textValue{
+    height: 40px;
+    width:80vw;
+  border-radius: 20px;
+  padding:10px;
+  border: 1px solid #5C69FF;
+  margin: 0;
+  resize: none;
+  outline: none;
+  }
+  #send{
+  outline: none;
+    height:40px;
+    width:80px;
+    border-radius:20px;
+    background:#5C69FF;
+    border:none;
+    color:white;
+  }
+  .sendMsgBox{
+    background: white;
+    height:50px;
+    width:100vw;
+    position: fixed;
+    bottom: 0;
+    left:0;
+    z-index: 4;
+    
+  }
+
+  .personName{
+    position: absolute;
+    top: -14px;
+    right: 5px;
+    font-size: 12px;
+    color: gray;
+  }
+  .personName1{
+    position: absolute;
+    top: -14px;
+    left: 5px;
+    font-size: 12px;
+    color: gray;
+  }
+  
+  </style>
+</head>
+<body>
+  
+  <div class="chatBox">
+    <div class="head">
+      <div class="profile">
+        <img src="https://www.picsum.photos/200/200" alt="">
+      </div>
+      <div class="online"></div>
+      <p id="joinRoomName">Simon Bot</p>
+    </div>
+    
+    <div class="messageBox" id="roomNameTag">
+  
+    </div>
+    
+    <div class="sendMsgBox" >
+          <form action="" id="form1">
+            <input id="textValue" cols="30" rows="10"></input>
+            <button id="send" onclick="sendMsg()" type="submit">Send</button>
+          </form>
+        </div>  
+  </div>
+  
+
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let user;
+      while(!user){
+
+        user= prompt("enter your name");
+      }
+    let params = new URLSearchParams(document.location.search);
+let globalRoomName = params.get("roomName"); // is the string "Jonathan"
+
+  var socket = io();
+  
+  var form1 = document.getElementById('form1');
+  var message = document.getElementById('textValue');
+
+  var joinRoomName= document.getElementById('joinRoomName');
+  var messageBox=document.querySelector(".messageBox");
+
+socket.emit("join room",globalRoomName);
+
+socket.on("roomName",(roomName)=>{
+  joinRoomName.innerHTML=`Room : ${roomName}`;
+  globalRoomName=roomName;
+})
+  form1.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    const sendMessage=message.value;
+
+    const data={
+      user,
+      message:sendMessage,
+      roomName:globalRoomName
+    }
+
+    socket.emit("clientMessage",data);
+
+  })
+
+  socket.on("response",({message,user})=>{
+    addSenderMsg(message,user)
+    })
+
+  var addSenderMsg=(msg,user)=>{
+      messageBox.innerHTML += `
+              <div id="botMsgMain">
+           <div class="profile">
+            <p class="personName1">${user}</p>
+             <img src="https://www.picsum.photos/200/200" alt="">
+           </div> <p id="botMsg">${msg}</p>
+          </div>
+              `
+        messageBox.scrollTop=messageBox.scrollHeight-messageBox.clientHeight;
+  }
+  
+
+
+    let sendMsg = () => {
+      var msg = textValue.value;
+      if (msg != "") { 
+      messageBox.innerHTML += `
+          <div class="myMsgOut">
+            <div id="myMsgMain">
+              <p class="personName">You</p>
+            <p id="myMsg">${msg}</p>
+           </div>
+          </div>
+          ` 
+      
+messageBox.scrollTop=messageBox.scrollHeight-messageBox.clientHeight;
+
+  
+  
+}}
+  
+    
+    
+  
+   
+
+  
+  </script>
+
+</body>
+</html>

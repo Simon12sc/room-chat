@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon - BigOwl</title>
+</head>
+<body>
+    <h1>hello big owl</h1>
+    <p>create or join room !!</p>
+    <form action="" id="form">
+
+        <input type="text" id="roomName">
+        <input type="submit" value="join or create">
+       
+    </form>
+    <script>
+        document.getElementById("form").addEventListener("submit",(e)=>{
+            e.preventDefault();
+            window.location.href="/groupChat/?roomName="+ document.getElementById("roomName").value;
+        })
+    </script>    
+</body>
+</html>
